@@ -5,7 +5,7 @@ using reservations_api.Services;
 namespace reservations_api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/reservations")]
 public class ReservationsController : ControllerBase
 {
   private readonly IReservationService _reservationService;
@@ -13,6 +13,18 @@ public class ReservationsController : ControllerBase
   public ReservationsController(IReservationService reservationService)
   {
     _reservationService = reservationService;
+  }
+
+  [HttpGet]
+  public async Task<IActionResult> GetByDate([FromQuery] DateOnly? date)
+  {
+    if (date is null)
+    {
+      return BadRequest(new { message = "Query parameter 'date' is required (format yyyy-MM-dd)." });
+    }
+
+    var reservations = await _reservationService.GetByDateAsync(date.Value);
+    return Ok(reservations);
   }
 
   [HttpPost]
